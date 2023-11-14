@@ -10,7 +10,7 @@ import struct
 i2c = busio.I2C(board.SCL, board.SDA)  # uses board.SCL and board.SDA
 
 sensor = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)
-ser = serial.Serial("/dev/ttySC0",115200,timeout=1)
+ser = serial.Serial("/dev/ttyS0",9600,timeout=1)
 time.sleep(1)
 
 print("Sending Message.....")
@@ -18,27 +18,11 @@ print("Sending Message.....")
 
 while True:
  
- 
-    #gyro_x, gyro_y, gyro_z = sensor.gyro
-    
-    #grabs temp values 
-    
     temp = sensor.temperature
+    buff=temp
+    time.sleep(1)
+    ser.write(struct.pack('f',buff))
 
-    try:
-
-        #stores temp
-        buff=temp
-        
-        #writes temp 
-        time.sleep(1)
-        ser.write(struct.pack('f',buff))
-        
-        
-        
-        
-        
-        
-    except KeyboardInterrupt:
-        print("Exiting Program")
+    #except KeyboardInterrupt:
+     #   print("Exiting Program")
     
