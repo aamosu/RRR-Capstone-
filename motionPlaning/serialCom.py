@@ -1,6 +1,7 @@
 import serial
 import time
 
+
 class ArduinoSerial:  
     def __init__(self , port):
         #ls -l /dev | grep ACM to identify serial port of the arduino
