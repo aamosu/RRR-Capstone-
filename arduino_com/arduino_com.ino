@@ -48,9 +48,13 @@ void loop() {
     //t = float(currentMillis) / 1000;
 
     getData();
-    //Serial.print(pulse0);
-    moveServos(pulse0, pulse1, pulse2, pulse3, pulse4, pulse5, pulse6, pulse7);
-    newData = false;
+    if(newData){
+      parseData();
+      newData = false;
+   
+      Serial.print(pulse0 + '\n');
+      moveServos(pulse0, pulse1, pulse2, pulse3, pulse4, pulse5, pulse6, pulse7);
+    }
   }
 }
 
@@ -75,7 +79,7 @@ void getData() {
 
   while (Serial.available() > 0 && newData == false) {
     char a = Serial.read();
-    
+    Serial.print("Working");
     if (a == '<') {
       receiving = true;
       index = 0;
