@@ -26,7 +26,7 @@ void setup() {
 }
 
 void loop() {
-  while(time1 < 10){
+  while(time1 < 6){
     //Manual Forward movement
     //Back Right
     servo8.write(0);  
@@ -62,10 +62,49 @@ void loop() {
     servo4.write(180);
     delay(50);
     time1 += 1;
+    Serial.print("Time1: ");
+    Serial.println(time1);
   }
   while(time2 < 5){
-    //Turn
+    //Manual Turning movement
+    //Back Right
+    servo8.write(0);  
+    servo7.write(45);
+
+    //Front Left
+    servo2.write(180);    
+    servo1.write(135);
+    delay(1000);
+
+    servo7.write(135);
+    servo1.write(45);
+    delay(100);
+
+    servo8.write(180);
+    servo2.write(0);
+    delay(50);
+
+    //Back Left 
+    servo6.write(180);    
+    servo5.write(0);
+
+    //Front Right
+    servo4.write(25);    
+    servo3.write(40);
+    delay(1000);
+
+    servo5.write(0);
+    servo3.write(135);
+    delay(100);
+
+    servo6.write(0);
+    servo4.write(180);
+    delay(50);
     time2 += 1;
+    
+    //Turn
+    Serial.print("Time2: ");
+    Serial.println(time2);
   }
   time1 = 0;
   time2 = 0;
