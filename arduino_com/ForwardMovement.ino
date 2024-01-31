@@ -10,6 +10,8 @@ Servo servo7;
 Servo servo8;
 
 int pos = 0;
+int time1 = 0;
+int time2 = 0;
 
 void setup() {
   servo1.attach(10,400,2000);
@@ -24,38 +26,47 @@ void setup() {
 }
 
 void loop() {
-  //Manual Forward movement
-  //Back Right
-  servo8.write(0);  
-  servo7.write(45);
+  while(time1 < 10){
+    //Manual Forward movement
+    //Back Right
+    servo8.write(0);  
+    servo7.write(45);
 
-  //Front Left
-  servo2.write(180);    
-  servo1.write(135);
-  delay(1000);
+    //Front Left
+    servo2.write(180);    
+    servo1.write(135);
+    delay(1000);
 
-  servo7.write(135);
-  servo1.write(45);
-  delay(100);
+    servo7.write(135);
+    servo1.write(45);
+    delay(100);
 
-  servo8.write(180);
-  servo2.write(0);
-  delay(50);
+    servo8.write(180);
+    servo2.write(0);
+    delay(50);
 
-  //Back Left 
-  servo6.write(180);    
-  servo5.write(190);
+    //Back Left 
+    servo6.write(180);    
+    servo5.write(190);
 
-  //Front Right
-  servo4.write(0);    
-  servo3.write(45);
-  delay(1000);
+    //Front Right
+    servo4.write(0);    
+    servo3.write(45);
+    delay(1000);
 
-  servo5.write(80);
-  servo3.write(135);
-  delay(100);
+    servo5.write(80);
+    servo3.write(135);
+    delay(100);
 
-  servo6.write(0);
-  servo4.write(180);
-  delay(50);
+    servo6.write(0);
+    servo4.write(180);
+    delay(50);
+    time1 += 1;
+  }
+  while(time2 < 5){
+    //Turn
+    time2 += 1;
+  }
+  time1 = 0;
+  time2 = 0;
 }
