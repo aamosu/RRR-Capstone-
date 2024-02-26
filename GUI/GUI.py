@@ -2,8 +2,8 @@ import tkinter as tk
 from tkinter.ttk import * 
 import random
 from PIL import Image, ImageTk
-import imageio
-
+#import imageio
+import subprocess
 
 
 
@@ -19,60 +19,6 @@ class SARAGUI:
         self.starterPage()
     
     
-    def create_label_array(self, frame):
-        labels = ["LiDar", "Servos", "Ultrasonic", "GPS", "LoRa", "HAM", "IMU", "Camera", "Display", "Robot Rpi"]
-        label_widgets = []
-
-        for i, label_text in enumerate(labels):
-            label = tk.Label(frame, text=label_text, bg='grey')
-            label.grid(row=0, column=i, padx=7, pady=5)
-            label_widgets.append(label)
-
-        return label_widgets
-    
-    def create_circles_array(self, frame):
-        circles = []
-
-        for i in range(10):
-            color = 'green' if random.choice([True, False]) else 'red'
-            circle = tk.Canvas(frame, width=20, height=20, bg=color)
-            circle.grid(row=1, column=i, padx=15, pady=0)
-            circles.append(circle)
-
-        return circles
-
-    def create_arrow_buttons(self, frame):
-        # Load arrow images
-        up_image = Image.open("C:\\Users\\Student\\Documents\\Capstone\\up.png")
-        down_image = Image.open("C:\\Users\\Student\\Documents\\Capstone\\down.png")
-        left_image = Image.open("C:\\Users\\Student\\Documents\\Capstone\\left.png")
-        right_image = Image.open("C:\\Users\\Student\\Documents\\Capstone\\right.jpg")
-
-        # Resize images to fit 800x480 frame
-        target_size = (int(800 / 5), int(480 / 4))
-        up_image = up_image.resize(target_size, Image.ANTIALIAS)
-        down_image = down_image.resize(target_size, Image.ANTIALIAS)
-        left_image = left_image.resize(target_size, Image.ANTIALIAS)
-        right_image = right_image.resize(target_size, Image.ANTIALIAS)
-
-        # Keep references to resized PhotoImage objects
-        self.up_image_tk = ImageTk.PhotoImage(up_image)
-        self.down_image_tk = ImageTk.PhotoImage(down_image)
-        self.left_image_tk = ImageTk.PhotoImage(left_image)
-        self.right_image_tk = ImageTk.PhotoImage(right_image)
-
-        arrow_buttons = [
-            (self.up_image_tk, "up", 0, 1),
-            (self.down_image_tk, "down", 2, 1),
-            (self.left_image_tk, "left", 1, 0),
-            (self.right_image_tk, "right", 1, 2)
-        ]
-
-        for img, command, row, column in arrow_buttons:
-            button = tk.Button(frame, image=img, command=lambda c=command: self.move(c))
-            button.grid(row=row, column=column, padx=10, pady=10)
-
-
 
     def starterPage(self):
         #top left frame with Label 
@@ -95,8 +41,9 @@ class SARAGUI:
 
         try:
             # Load and resize image
-            image = Image.open("C:\\Users\\Student\\Documents\\Capstone\\robot image.png")
-            resized_image = image.resize((int(image.width /6 ), int(image.height / 6)), Image.ANTIALIAS)
+            image = Image.open("C:\\Users\\Student\\Documents\\Capstone\\RRR-Capstone-\\GUI\\Images\\image.png")
+
+            resized_image = image.resize((int(image.width /6 ), int(image.height / 6)))
 
             # Convert to PhotoImage
             self.image_tk = ImageTk.PhotoImage(resized_image)
@@ -152,23 +99,6 @@ class SARAGUI:
         #Place Frame Video Frame 
         self.videoFrame.place(x=250, y=10)
 
-        #Diagonistic Frame 
-        #Right Frame Size, Charc 
-        self.diagonisticFrame=tk.Frame(self.master,width=200, height=130, bg='grey')
-        self.diagonisticFrame.grid(row=2,column=1,padx=10,pady=5)
-
-        labels = self.create_label_array(self.diagonisticFrame)
-
-        #Place Frame Video Frame 
-        self.diagonisticFrame.place(x=250, y=350)
-
-        # Circles Frame
-        self.circlesFrame = tk.Frame(self.master, width=535, height=40, bg='skyblue')
-        self.circlesFrame.grid(row=3, column=2, padx=10, pady=5)
-
-        circles = self.create_circles_array(self.circlesFrame)
-        self.circlesFrame.place(x=250, y=390)
-
         btn_open_second_window = tk.Button(self.master, text="2", command=self.openSecondWindow)
         btn_open_second_window.place(x=20, y=450)
 
@@ -177,16 +107,7 @@ class SARAGUI:
         print(f"Moving {direction}")
 
     def openSecondWindow(self):
-        second_window = tk.Toplevel(self.master)
-        second_window.title("S.A.R.A Controls")
-        second_window.geometry("800x480")
-
-        # Adding control frame with arrow buttons
-        control_frame = tk.Frame(second_window, width=200, height=150, bg='grey')
-        control_frame.grid(row=0, column=0, padx=25, pady=5)
-        control_frame.place(x=100, y=50)
-
-        self.create_arrow_buttons(control_frame)
+        subprocess.Popen(["python", "c:\\Users\\Student\\Documents\\Capstone\\RRR-Capstone-\\GUI\\joystickTest.py"])
 
     def load_video_frames(self):
         # Load video frames from a video file
