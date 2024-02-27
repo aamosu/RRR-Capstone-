@@ -14,15 +14,18 @@ print("Sending Message.....")
 ser = serial.Serial("/dev/ttyS0", baudrate=9600)
 time.sleep(1)
 
-try:
+while True:
+    try:
 
-        time.sleep(1)
-        #temp=1
-        ser.write(struct.pack('f',1.23))
-        #sleep(1)
+            time.sleep(2)
+            temp=1.23
+            ser.write(struct.pack('f',temp))
+            print("sent")
+            time.sleep(3)
+            #sleep(1)
 
-    
+        
 
-except KeyboardInterrupt:
-    print("Exiting Program")
+    except KeyboardInterrupt:
+        print("Exiting Program")
 
