@@ -4,6 +4,9 @@ import random
 from PIL import Image, ImageTk
 #import imageio
 import subprocess
+import cv2
+from PIL import Image, ImageTk
+import threading
 
 
 
@@ -17,6 +20,8 @@ class SARAGUI:
         #size of window for testing and editing on laptop
         self.master.geometry("800x480") 
         self.starterPage()
+        self.video_thread = threading.Thread(target=self.stream_video)
+        self.video_thread.start()
     
     
 
@@ -85,44 +90,22 @@ class SARAGUI:
         battery_value = tk.Label(self.statsFrame, text=str(random.randint(0, 100)) + "%", bg='grey')
         battery_value.grid(row=4, column=1, padx=7, pady=5)
 
-        #label_widgets.extend([temperature_label, longitude_label, latitude_label, battery_label])
-
-
-        #Video Frame
-        #Right Frame Size, Charc 
-        self.videoFrame=tk.Frame(self.master,width=535, height=300, bg='grey')
-        #self.videoFrame.grid(row=0,column=1,padx=10,pady=5)
-
-        # Load video frames
-        #self.load_video_frames()
-
-        #Place Frame Video Frame 
+        self.videoFrame = tk.Frame(self.master, width=535, height=300, bg='grey')
         self.videoFrame.place(x=250, y=10)
+        self.videoLabel = tk.Label(self.videoFrame)
+        self.videoLabel.pack()
 
         btn_open_second_window = tk.Button(self.master, text="2", command=self.openSecondWindow)
         btn_open_second_window.place(x=20, y=450)
 
-    def move(self, direction):
-        # Implement your robot movement logic here
-        print(f"Moving {direction}")
-
     def openSecondWindow(self):
         subprocess.Popen(["python", "c:\\Users\\Student\\Documents\\Capstone\\RRR-Capstone-\\GUI\\joystickTest.py"])
-
-    def load_video_frames(self):
-        # Load video frames from a video file
-        video_path = "C:\\Users\\Student\\Documents\\Capstone\\testVid.mp4"
-        self.video = imageio.get_reader(video_path)
-        self.video_length = len(self.video)
-        self.current_frame = 0
-
-        self.update_video_frame()
 
     def update_video_frame(self):
         if self.current_frame < self.video_length:
             frame = self.video.get_data(self.current_frame)
             image = Image.fromarray(frame)
-            resized_image = image.resize((535, 300), Image.ANTIALIAS)
+            resized_image = image.resize((535, 300), Image.ANTIALIAS)  # Corrected line
             tk_image = ImageTk.PhotoImage(resized_image)
 
             self.videoLabel.config(image=tk_image)
@@ -130,6 +113,29 @@ class SARAGUI:
 
             self.master.after(30, self.update_video_frame)  # Schedule the next frame update after 30 milliseconds
             self.current_frame += 1
+
+    def stream_video(self):
+        video_capture = cv2.VideoCapture(0)
+        while True:
+            ret, frame = video_capture.read()
+            if ret:
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                img = Image.fromarray(frame)
+                img = img.resize((535, 300), Image.ANTIALIAS)  # Corrected line
+                img_tk = ImageTk.PhotoImage(image=img)
+                self.videoLabel.config(image=img_tk)
+                self.videoLabel.image = img_tk
+
+                # Update other GUI elements (example: dynamic values)
+                self.update_dynamic_values()
+
+
+    def update_dynamic_values(self):
+        # Update dynamic values here (example: random values for demonstration)
+        self.temperature_value.config(text=str(random.randint(0, 100)) + "°C")
+        self.longitude_value.config(text=str(random.uniform(-180, 180)))
+        self.latitude_value.config(text=str(random.uniform(-90, 90)))
+        self.battery_value.config(text=str(random.randint(0, 100)) + "%")
 
 
 # Creates Window 
