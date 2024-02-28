@@ -1,18 +1,9 @@
+import serial
 from PyQt5.QtCore import Qt, QPointF, QRectF, QLineF
 from PyQt5.QtGui import QPainter
 from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QGridLayout, QStyleFactory
 
-
-
-
-import sys
-from enum import Enum
-
-class Direction(Enum):
-    Left = 0
-    Right = 1
-    Up = 2
-    Down = 3
+ser = serial.Serial("/dev/ttyS0", baudrate=9600)
 
 class Joystick(QWidget):
     def __init__(self, parent=None):
@@ -37,7 +28,6 @@ class Joystick(QWidget):
     def _center(self):
         return QPointF(self.width()/2, self.height()/2)
 
-
     def _boundJoystick(self, point):
         limitLine = QLineF(self._center(), point)
         if (limitLine.length() > self.__maxDistance):
@@ -50,16 +40,8 @@ class Joystick(QWidget):
         normVector = QLineF(self._center(), self.movingOffset)
         currentDistance = normVector.length()
         angle = normVector.angle()
-
         distance = min(currentDistance / self.__maxDistance, 1.0)
-        if 45 <= angle < 135:
-            return (distance,angle)
-        elif 135 <= angle < 225:
-            return (distance,angle)
-        elif 225 <= angle < 315:
-            return ( distance,angle)
-        return (distance,angle)
-
+        return distance, angle
 
     def mousePressEvent(self, ev):
         self.grabCenter = self._centerEllipse().contains(ev.pos())
@@ -74,31 +56,28 @@ class Joystick(QWidget):
         if self.grabCenter:
             self.movingOffset = self._boundJoystick(event.pos())
             self.update()
-        print(self.joystickDirection())
+            distance, angle = self.joystickDirection()
+            print(distance,angle)
+            data = f"{round(distance,4)},{round(angle,4)}'\n'".encode('utf-8')
+            ser.write(data)
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Joystick')
+        self.setMinimumSize(200, 200)
+
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+
+        layout = QGridLayout(central_widget)
+        self.joystick = Joystick()
+        layout.addWidget(self.joystick, 0, 0)
 
 if __name__ == '__main__':
-    # Create main application window
-    app = QApplication([])
+    import sys
+    app = QApplication(sys.argv)
     app.setStyle(QStyleFactory.create("Cleanlooks"))
-    mw = QMainWindow()
-    mw.setWindowTitle('Joystick example')
-
-    # Create and set widget layout
-    # Main widget container
-    cw = QWidget()
-    ml = QGridLayout()
-    cw.setLayout(ml)
-    mw.setCentralWidget(cw)
-
-    # Create joystick 
-    joystick = Joystick()
-
-    # ml.addLayout(joystick.get_joystick_layout(),0,0)
-    ml.addWidget(joystick,0,0)
-
-    mw.show()
-
-    if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
-        QApplication.instance().exec_()
-
-    
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())

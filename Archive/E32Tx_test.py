@@ -1,28 +1,26 @@
 
 import time
 import serial
-from time import sleep
-import struct 
-
-#GPIO.setwarnings(False)
-#GPIO.setmode(GPIO.BOARD)
-#GPIO.setup(25, GPIO.OUT, initial=GPIO.LOW)
-
 
 print("Sending Message.....")
 
+# Open serial connection
 ser = serial.Serial("/dev/ttyS0", baudrate=9600)
-time.sleep(1)
-
+#time.sleep(1)  # Wait for the serial connection to initialize
+temp = 490012345678
+ser.flushOutput()
 try:
-
-        time.sleep(1)
-        #temp=1
-        ser.write(struct.pack('f',1.23))
-        #sleep(1)
-
-    
+    while True:
+            
+            buff=str(temp)
+            time.sleep(3)
+            print(ser.write(buff.encode()))
+            
 
 except KeyboardInterrupt:
     print("Exiting Program")
+    # Close serial connection
+    ser.close()
+
+
 

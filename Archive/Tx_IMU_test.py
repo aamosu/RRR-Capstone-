@@ -6,16 +6,16 @@ print("Sending Message.....")
 
 ser = serial.Serial("/dev/ttyS0", baudrate=9600)
 time.sleep(1)
-try:
+while True:
     #time.sleep(5)
     temp='Aaliah'
-    encoded_temp = temp.encode('ascii', 'utf-8')
-    temp_bytes = temp_str.encode('utf-8')
-    #ser.write(bytes(temp))
+    encoded_temp = temp.encode('ascii')
+    temp_bytes = temp.encode('utf-8')
+    ser.write(encoded_temp)
+    time.sleep(3)
    
 
-except KeyboardInterrupt:
-        print("Exiting Program")
+
     
     
 #while loop constantly read values from IMU and while loop constantly transmit the values currently held
