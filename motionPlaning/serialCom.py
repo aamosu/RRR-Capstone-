@@ -16,10 +16,11 @@ class ArduinoSerial:
         self.interval = 0.02 #arduino loop running at 20 ms
         
     def serialSend(self, pulse):  
-        comando = "<{0}#{1}#{2}#{3}#{4}#{5}#{6}#{7}>" #Input
+        comando = "<{0}#{1}#{2}#{3}#{4}#{5}#{6}#{7}#{8}#{9}#{10}#{11}>" #Input
         command=comando.format(int(pulse[0]), int(pulse[1]), int(pulse[2]), 
                                    int(pulse[3]), int(pulse[4]), int(pulse[5]), 
-                                   int(pulse[6]), int(pulse[7]))
+                                   int(pulse[6]), int(pulse[7]),int(pulse[8]),
+                                   int(pulse[9]),int(pulse[10]),int(pulse[11]))
         self.arduino.write(bytes(command , encoding='utf8'))
         self.lastTime = time.time()
             
