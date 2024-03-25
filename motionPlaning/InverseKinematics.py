@@ -1,4 +1,5 @@
 import numpy as np
+
 #InverseKinematics.py
 
 #Calculating the joint angles needed to achieve a certain position of the end effector (foot)
@@ -6,43 +7,27 @@ import numpy as np
 
 #Calculations derived from https://www.mdpi.com/2076-3417/12/9/4358
 
-def calculate_theta1(Px, Pz, L1, L2, L3):
-    # Calculate a and b
-    a = (L1 / 2) * L2 - Px * L2 + L2 * L3
-    b = Px**2 - 2 * Px * (L1 / 2) - 2 * Px * L3 + Pz**2 + (L1 / 2)**2 + L1 * L3 + L3**2
+l, l1, l2 = 1.93, .869, 3.119 #in
 
-    # Calculate sθ1 and cθ1
-    s_theta1 = ((L1 / 2) - Px + L3) * a / (Pz * b - (L2 / 2) * Pz)
-    c_theta1 = a + Pz * np.sqrt(b - L2**2) / b
+def inverse_kinematics(x, y):
+    # Calculating distances AC and EC using the given positions of the foot-end point C (x, y)
+    l_AC = np.sqrt(x**2 + y**2)
+    l_EC = np.sqrt((x - l)**2 + y**2)
 
-    # Calculate θ1
-    theta1 = np.arctan2(s_theta1, c_theta1)
+    # Using cosine law to find the angles, with inputs clipped to [-1, 1]
+    cos_CAE = np.clip((l_AC**2 + l**2 - l_EC**2) / (2 * l * l_AC), -1, 1)
+    cos_CEA = np.clip((l_EC**2 + l**2 - l_AC**2) / (2 * l * l_EC), -1, 1)
+    cos_BAC = np.clip((l1**2 + l_AC**2 - l2**2) / (2 * l1 * l_AC), -1, 1)
+    cos_CED = np.clip((l1**2 + l_EC**2 - l2**2) / (2 * l1 * l_EC), -1, 1)
 
-    return theta1
+    # Calculating the angles using np.arccos with clipped inputs
+    angle_CAE = np.arccos(cos_CAE)
+    angle_CEA = np.arccos(cos_CEA)
+    angle_BAC = np.arccos(cos_BAC)
+    angle_CED = np.arccos(cos_CED)
 
-def calculate_theta2(Px, Pz, L1, L5):
-    # Calculate c and d
-    c = -4 * Px**2 - 8 * Px * (L1 / 2) - 4 * Pz**2 + L5**2 - 4 * (L1 / 2)**2
-    d = Px**2 + 2 * Px * (L1 / 2) + Pz**2 + (L1 / 2)**2
-    print(c)
-    # Calculate sθ2 and cθ2
-    s_theta2 = Pz * (L5 + np.sqrt(d)) / (2 * d)
-    c_theta2 = (Px + (L1 / 2)) * (L5 + np.sqrt(c)) / (2 * d)
+    # Calculating theta1 and theta2
+    theta1 = np.rad2deg(angle_CAE + angle_BAC)
+    theta2 = np.rad2deg(np.pi - angle_CEA - angle_CED)
 
-    # Calculate θ2
-    theta2 = np.arctan2(s_theta2, c_theta2)
-
-    return theta2
-
-##Testing the functions
-# Define link lengths and foot position (replace with actual values)
-L1, L2, L3, L5 = 200, 350, 1000, 350
-Px, Pz = 50, 50
-
-# Calculate joint angles
-theta1 = calculate_theta1(Px, Pz, L1, L2, L3)
-theta2 = calculate_theta2(Px, Pz, L1, L5)
-
-# Print the results
-print(f"Theta1: {np.degrees(theta1)} degrees")
-print(f"Theta2: {np.degrees(theta2)} degrees")
+    return theta1, theta2
