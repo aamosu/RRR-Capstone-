@@ -5,18 +5,26 @@
 # walk, trot, stop
 
 import numpy as np
-import matplotlib as plt
 
-def arcTrajectory(radius, num_points):
-    theta = np.linspace(np.radians(225), np.radians(315), num_points)
-    x_bottom = radius * np.cos(theta)
-    y_bottom = radius * np.sin(theta)
+def arcTrajectory(x_s, step_length, step_height,step_offset, num_points=4):
+    """
+    Generates the points for half of the cycloid trajectory of the foot for the swing phase.
     
-    x_top = x_bottom
-    y_top = -y_bottom + (y_bottom[0]*2)
+    Parameters:
+    - x_s: Starting x coordinate of the foot-end.
+    - step_length: The distance between the starting and landing points.
+    - step_height: The maximum height of the foot-end from the ground.
+    - num_points: Number of points to generate for the trajectory.
     
-    x_combined = np.concatenate([x_bottom,x_top])
-    y_combined = np.concatenate([y_bottom,y_top])
+    Returns:
+    - x, y: The coordinates of the foot-end points in the half-cycloid trajectory.
+    """
+    t = np.linspace(np.pi, 0, num_points)  # Only go from 0 to pi for half the cycloid
+    x = x_s + (step_length / 2) * (1 - np.cos(t))
+    y = step_height * (1 - np.sin(t))
+    
+    y = np.append(y, np.linspace(y[-1],y[0],int(num_points/2))[1:])
+    x = np.append(x, np.linspace(x[-1],x[0],int(num_points/2))[1:]) -x[-1]
+    return x, -(-(y+step_offset)+step_height)
 
-    
-    return x_combined,y_combined
+

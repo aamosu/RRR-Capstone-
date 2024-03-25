@@ -3,49 +3,69 @@ import time
 import csv
 import serial
 
-from motionPlaning.serialCom import ArduinoSerial
+from motionPlaning.serialCOM import ArduinoSerial
 from motionPlaning import anglesToPulse
 import motionPlaning.gaitPlanner as gp
 import motionPlaning.InverseKinematics as IK
 
+arduino = ArduinoSerial('COM3') #need to specify the serial port
 
-arduino = ArduinoSerial('/dev/ttyACM0') #need to specify the serial port
+FR_angles = [0,0,0] #1,2,3
+FL_angles = [0,0, 0] #4,5,6
+BR_angles = [135,0, 0] #7,8,9
+BL_angles = [100,0, 0] #10,11,12
 
-# Define link lengths and foot position (replace with actual values)
-#L1 = horizontal distance between servos
-#L2 and L5 = Metal Horn length
-#L3 = Leg Length
-L1, L2, L3, L5 = 56, 25, 90, 25 #mm
+#count =0 
 
-BR_angles = [0,0] #1,2
-BL_angles = [0,0] #3,4
-FR_angles = [0,0] #5,6
-FL_angles = [0,0] #7,8
+# Parameters for the half-cycloid trajectory
+step_length = 2  # Step size in mm
+x_s = -step_length / 2  # We start at negative half the step length to center the curve around zero
+step_height = 1  # Step height in inches
+step_offset = 3.5
 
-x_traj,y_traj = gp.arcTrajectory(100, 10)
+# Generate the trajectory points
+x_cycloid, y_cycloid = gp.arcTrajectory(x_s, step_length, step_height,step_offset)
+
 i = 0
 
-pulsesCommand = anglesToPulse.convert(BR_angles, BL_angles,FR_angles, FL_angles)
-#print(pulsesCommand)
+pulsesCommand = anglesToPulse.convert(FR_angles, FL_angles,BR_angles, BL_angles)
+print(pulsesCommand)
 arduino.serialSend(pulsesCommand)#send serial command to arduino
 
-while(True):
+theta1_arr = []
+theta2_arr = []
 
-    # Calculate joint angles
-    theta1 = IK.calculate_theta1(x_traj[i], y_traj[i], L1, L2, L3)
-    theta2 = IK.calculate_theta2(x_traj[i], y_traj[i], L1, L5)
-
-    BR_angles = [theta1,theta2] #1,2
-    BL_angles = [theta1-np.radians(90),theta2-np.radians(90)] #3,4
-    FR_angles = [theta1-np.radians(90),theta2-np.radians(90)] #5,6
-    FL_angles = [theta1,theta2] #7,8
+for x,y in zip(x_cycloid, y_cycloid):
+    theta1, theta2 = IK.inverse_kinematics(x, y)
+    theta1_arr.append(theta1)
+    theta2_arr.append(theta2)
     
-    if i >= len(x_traj):
+for k in range(1000000):
+    # Calculate joint angles
+#     theta1, theta2= IK.inverse_kinematics(x_cycloid[i], y_cycloid[i])
+    #print(f"Theta1: {round(theta1,2)} Theta2: {round(theta2,2)}")
+    
+    # FR_angles = [0,0,0] #1,2,3
+    # FL_angles = [225-theta1_arr[i],135-theta2_arr[i], 0] #4,5,6
+    # BR_angles = [135, 225-theta1_arr[i],135-theta2_arr[i]] #7,8,9
+    # BL_angles = [100,0, 0] #10,11,12
+
+    FL_angles = [0,0,0] #1,2,3
+    FR_angles = [225-theta1_arr[i],135-theta2_arr[i], 0] #4,5,6
+    BR_angles = [135,225-theta1_arr[i], 135-theta2_arr[i]] #7,8,9
+    BL_angles = [100,0, 0] #10,11,12
+    
+    #print(len(x_cycloid))
+    if i == len(x_cycloid) -1:
         i = 0
+        continue
     else:
         i+=1
+        #print(i)
 
-    pulsesCommand = anglesToPulse.convert(BR_angles, BL_angles,FR_angles, FL_angles)
-    #print(pulsesCommand)
+    pulsesCommand = anglesToPulse.convert(FR_angles, FL_angles,BR_angles, BL_angles)
+    print(pulsesCommand)
     arduino.serialSend(pulsesCommand)#send serial command to arduino
+#     count += 1
+    time.sleep(1)
 
