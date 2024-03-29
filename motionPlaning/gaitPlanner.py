@@ -6,7 +6,7 @@
 
 import numpy as np
 
-def arcTrajectory(x_s, step_length, step_height,step_offset, num_points=4):
+def arcTrajectory(x_s, step_length, step_height,step_offset, num_points=5):
     """
     Generates the points for half of the cycloid trajectory of the foot for the swing phase.
     
