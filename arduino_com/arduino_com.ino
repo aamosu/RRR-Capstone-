@@ -38,7 +38,7 @@ void setup() {
   Servos[6].attach(7);
   Servos[7].attach(8);
 
-  Serial.begin(9600);
+  Serial.begin(115200);
 }
 
 void loop() {

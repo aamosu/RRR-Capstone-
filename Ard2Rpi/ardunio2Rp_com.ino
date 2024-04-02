@@ -1,6 +1,9 @@
 // Include the Arduino Serial library
 #include <Arduino.h>
 #include "ultrasonicFunc.h"
+
+#include "GPS.h"
+#include "Gyro.h"
 //#include "ultrasonicFunc.cpp"
 
 
@@ -29,6 +32,9 @@ void setup() {
   //Sensor 3
   ultrasonicSetup(2,trigPinUS2,echoPinUS2);
 
+  GPSSetup();
+  GyroSetup();
+
 }
 
 void loop() {
@@ -36,6 +42,7 @@ void loop() {
   int disSen0=ultrasonicLoop(0,trigPinUS0,echoPinUS0);
   int disSen1=ultrasonicLoop(1,trigPinUS1,echoPinUS1);
   int disSen2=ultrasonicLoop(2,trigPinUS2,echoPinUS2);
+  float 
   Serial.println("L"+ String(disSen0));
   Serial.println("F"+ String(disSen1));
   Serial.println("R"+ String(disSen2));
