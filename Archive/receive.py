@@ -1,21 +1,19 @@
 # -*- coding:utf-8 -*-
-import RPi.GPIO as GPIO
 import serial
 import time
 
-
-ser = serial.Serial("/dev/ttyS0",9600,timeout=1)
-
+# Open serial port
+ser = serial.Serial("/dev/ttyS0", 9600, timeout=1)
 ser.flushInput()
 
-data = ""
-while 1: 
-    #while ser.inWaiting() > 0:
-     #   data += ser.read(ser.inWaiting())
-    #time.sleep(6)
-    data=ser.read()
-    #if data != "":
-     #   for i in range(len(data)):
-    print (data)
-       # print ("")
-       # data = ""
+# Main loop
+while True:
+    # Check if there's data available to read
+    while ser.inWaiting() > 0:
+        # Read one byte at a time
+        data = ser.read(4)
+        # Print the received byte
+        print(data)
+    # Add a delay to prevent busy-waiting
+    time.sleep(0.1)
+
