@@ -9,16 +9,16 @@
 
 // Pins for ultrasonic sensor
 //left
-const int trigPinUS0 = 13;
-const int echoPinUS0 = 12;
+const int trigPinUS0 = 45;
+const int echoPinUS0 = 44;
 
 //front middle
-const int trigPinUS1 = 9;
-const int echoPinUS1 = 8;
+const int trigPinUS1 = 23;
+const int echoPinUS1 = 22;
 
 //right
-const int trigPinUS2 = 5;
-const int echoPinUS2 = 4;
+const int trigPinUS2 = 39;
+const int echoPinUS2 = 38;
 
 
 void setup() {
@@ -43,10 +43,11 @@ void loop() {
   int disSen1=ultrasonicLoop(1,trigPinUS1,echoPinUS1);
   int disSen2=ultrasonicLoop(2,trigPinUS2,echoPinUS2);
   float 
-  Serial.println("L"+ String(disSen0));
-  Serial.println("F"+ String(disSen1));
-  Serial.println("R"+ String(disSen2));
-  delay(5000);
+  Serial.print("F"+ String(disSen1));
+  Serial.print("L"+ String(disSen0));
+  Serial.print("R"+ String(disSen2));
+  Serial.println("");
+  delay(2000);
 }
 
 
