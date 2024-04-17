@@ -19,24 +19,29 @@ rightDistance=0
 # Functions for driving
 def goforward():
     print ("Going Forward!")
+    ser.write("F")
     time.sleep(2)
 
 
 def turnleft():
     print ("Turning Left")
+    ser.write("L")
     time.sleep(2)
 
 
 def turnright():
     print ("Turning Right")
+    ser.write("R")
     time.sleep(2)
 
 def gobackward():
     print ("Going Backward")
+    ser.write("B")
     time.sleep(2)
 
 def stopmotors():
     print ("Stopping")
+    ser.write("S")
     time.sleep(2)
 
 # Check for obstacles as you drive forward

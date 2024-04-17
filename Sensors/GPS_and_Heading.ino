@@ -2,7 +2,7 @@
 #include "TinyGPSPlus.h"
 #include "SoftwareSerial.h"
 
-SoftwareSerial serial_connection(10, 11); //RX from GPS into pin ~11, TX from GPS into pin ~10
+SoftwareSerial serial_connection(30, 31); //RX from GPS into pin ~11, TX from GPS into pin ~10
 TinyGPSPlus gps;
 
 short x,y,z;
