@@ -36,12 +36,23 @@ class Joystick(QWidget):
 
     def joystickDirection(self):
         if not self.grabCenter:
-            return 0
+            return 0, 0, ''  # No movement, return zero distance, zero angle, and empty action
         normVector = QLineF(self._center(), self.movingOffset)
         currentDistance = normVector.length()
         angle = normVector.angle()
         distance = min(currentDistance / self.__maxDistance, 1.0)
-        return distance, angle
+
+        # Determine action based on angle
+        action = ''
+        if angle >80 and angle <100:
+            action = 'F'
+        if angle < 90 and angle> 0:
+            action = 'R'
+        elif angle < 180 and angle < 90:
+            action = 'L'
+        elif angle > 90 and angle < 180:
+            action = 'B'
+        return distance, angle, action
 
     def mousePressEvent(self, ev):
         self.grabCenter = self._centerEllipse().contains(ev.pos())
@@ -56,10 +67,11 @@ class Joystick(QWidget):
         if self.grabCenter:
             self.movingOffset = self._boundJoystick(event.pos())
             self.update()
-            distance, angle = self.joystickDirection()
-            print(distance,angle)
-            data = f"{round(distance,4)},{round(angle,4)}'\n'".encode('utf-8')
-            ser.write(data)
+            distance, angle, action = self.joystickDirection()
+            print(distance, angle, action)
+            if action:
+                data = f"{action}\n".encode('utf-8')  # Send action over serial
+                ser.write(data)
 
 class MainWindow(QMainWindow):
     def __init__(self):
