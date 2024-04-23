@@ -1,52 +1,70 @@
 import time
 import serial
-from Sensors.LoRa.LoRacomm import *
+import struct 
 
-threshold = 20
+ser = serial.Serial(
+port='/COM4',
+baudrate=9600,
+parity=serial.PARITY_ODD,
+stopbits=serial.STOPBITS_TWO,
+bytesize=serial.SEVENBITS
+)
 
-class ObjectAvoid:
-    def __init__(self):
-        self.ser = loRaComm('/dev/ttyACM1')
-        self.frontDistance = 0
-        self.leftDistance = 0
-        self.rightDistance = 0
+threshhold = 20
+frontDistance=0
+leftDistance=0
+rightDistance=0
 
-    def go_forward(self):
-        self.ser.writeRobot('F')
+# Functions for driving
+def goforward():
+    print ("Going Forward!")
+    ser.write("F")
+    time.sleep(2)
 
-    def turn_left(self):
-        self.ser.writeRobot('L')
 
-    def turn_right(self):
-        self.ser.writeRobot('R')
+def turnleft():
+    print ("Turning Left")
+    ser.write("L")
+    time.sleep(2)
 
-    def go_backward(self):
-        self.ser.writeRobot('B')
 
-    def stop_motors(self):
-        self.ser.writeRobot('S')
+def turnright():
+    print ("Turning Right")
+    ser.write("R")
+    time.sleep(2)
 
-    def check_and_drive_front(self):
-        while self.frontDistance < threshold:
-            self.stop_motors()
-            if self.rightDistance < threshold and self.leftDistance > threshold:
-                self.turn_left()
-                self.check_and_turn_right()
-            elif self.leftDistance < threshold and self.rightDistance > threshold:
-                self.turn_right()
-                self.check_and_turn_left()
-            elif self.rightDistance > threshold and self.leftDistance > threshold:
-                self.turn_right()
-                self.check_and_turn_left()
-            else:
-                self.go_backward()
-                if self.rightDistance > threshold:
-                    self.turn_right()
-                    self.check_and_turn_left()
-                elif self.leftDistance > threshold:
-                    self.turn_left()
-                    self.check_and_turn_right()
-        self.go_forward()
+def gobackward():
+    print ("Going Backward")
+    ser.write("B")
+    time.sleep(2)
+
+def stopmotors():
+    print ("Stopping")
+    ser.write("S")
+    time.sleep(2)
+
+# Check for obstacles as you drive forward
+def checkanddrivefront():
+    while frontDistance < threshhold:
+        stopmotors()
+        if rightDistance < threshhold and leftDistance > threshhold:
+            turnleft()
+            checkandturnright()
+        elif leftDistance < threshhold and rightDistance > threshhold:
+            turnright()
+            checkandturnleft()
+        elif rightDistance > threshhold and leftDistance > threshhold:
+            turnright()
+            checkandturnleft()
+        else:
+            gobackward()
+            if rightDistance > threshhold:
+                turnright()
+                checkandturnleft()
+            elif leftDistance > threshhold:
+                turnleft()
+                checkandturnright()
+    goforward()
 
     def check_and_turn_right(self):
         while self.rightDistance < threshold:

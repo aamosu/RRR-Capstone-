@@ -18,6 +18,14 @@ class loRaComm:
             print(f"Error opening serial port {port}: {e}")
             self.lora = None  # Ensure lora is set to None if we fail to open the port
 
+            time.sleep(2)            # Wait after setting DTR to True
+            self.lastTime = 0.0
+            self.previousMillis = 0.0
+            self.interval = 0.02     # Sampling rate interval
+        except serial.SerialException as e:
+            print(f"Error opening serial port {port}: {e}")
+            self.lora = None  # Ensure lora is set to None if we fail to open the port
+
     def read(self):
         if self.lora is not None and self.lora.inWaiting() > 0:
             try:

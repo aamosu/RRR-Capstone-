@@ -4,7 +4,7 @@ import serial
 import struct 
 
 ser = serial.Serial(
-port='/COM4',
+port='/dev/ttyACM0',
 baudrate=9600,
 parity=serial.PARITY_ODD,
 stopbits=serial.STOPBITS_TWO,
@@ -12,9 +12,7 @@ bytesize=serial.SEVENBITS
 )
 
 threshhold = 20
-frontDistance=0
-leftDistance=0
-rightDistance=0
+
 
 # Functions for driving
 def goforward():
@@ -25,11 +23,13 @@ def goforward():
 def turnleft():
     print ("Turning Left")
     time.sleep(2)
-
+    print ("Turned")
+    time.sleep(2)
 
 def turnright():
     print ("Turning Right")
     time.sleep(2)
+    print("Turned")
 
 def gobackward():
     print ("Going Backward")
@@ -40,27 +40,32 @@ def stopmotors():
     time.sleep(2)
 
 # Check for obstacles as you drive forward
-def checkanddrivefront():
-    while frontDistance < threshhold:
+def obstacleavoiddrive():
+    frontDistance, leftDistance, rightDistance = checkSensors(ser)
+    if frontDistance < threshhold and frontDistance != 0:
         stopmotors()
-        if rightDistance < threshhold and leftDistance > threshhold:
-            turnleft()
-            checkandturnright()
-        elif leftDistance < threshhold and rightDistance > threshhold:
+        if rightDistance < threshhold and (leftDistance > threshhold or leftDistance == 0):
+            turnleft() 
+            checkandturnright(rightDistance)
+        elif leftDistance < threshhold and (rightDistance > threshhold or rightDistance == 0):
             turnright()
-            checkandturnleft()
-        elif rightDistance > threshhold and leftDistance > threshhold:
+            checkandturnleft(leftDistance)
+        elif (rightDistance > threshhold or rightDistance == 0) and (leftDistance > threshhold or leftDistance == 0):
             turnright()
-            checkandturnleft()
+            checkandturnleft(leftDistance)
         else:
-            gobackward()
-            if rightDistance > threshhold:
-                turnright()
-                checkandturnleft()
-            elif leftDistance > threshhold:
-                turnleft()
-                checkandturnright()
-    goforward()
+            while ((rightDistance < threshhold and rightDistance != 0) and (leftDistance < threshhold and rightDistance != 0)):
+                gobackward() #once robot finds a side to turn to you cant check side sensors to tell when to turn back as you have backed
+                #up far away enough from the initial front obstacle anyways. so we need to explicitly say just walk forward enough before turning
+                frontDistance, leftDistance, rightDistance = checkSensors(ser)
+                if (rightDistance > threshhold or rightDistance == 0):
+                    turnright()
+                    checkandturnleft(leftDistance)
+                elif (leftDistance > threshhold or leftDistance == 0):
+                    turnleft()
+                    checkandturnright(rightDistance)
+    elif frontDistance > threshhold or frontDistance == 0:
+        goforward()
 
 
 # Check right obstacle and turn left if there is an obstacle
@@ -85,31 +90,24 @@ def cleargpios():
     print ("All GPIOs CLEARED")
 
 def checkSensors(ser):
-    for i in range(3):
-        lineRead =ser.readline().rstrip()
-        line=lineRead.decode("utf-8")
-        print(line)
-        if not line:
-            continue
-        sensorLoc = line[0]
-        #print (sensorLoc)
-        data = int(line[1:])
-            #print(data)
-        if sensorLoc == 'L':
-            leftDistance = data
-        elif sensorLoc == 'F':
-            frontDistance = data
-        elif sensorLoc == 'R':
-            rightDistance = data
-        else:
-            pass
+    lineRead = ser.readline().decode().strip()
+    line = lineRead.split()
+    print(line)
+    frontData = line[0]
+    frontDistance = int(frontData[1:])
+    leftData = line[1]
+    leftDistance = int(leftData[1:])
+    rightData = line[2]
+    rightDistance = int(rightData[1:])
+    return frontDistance, leftDistance, rightDistance
     
 
 def main():
-  print ("start driving: ")
-  while(True):
-    checkSensors(ser)
-    checkanddrivefront()
+    goforward()
+    while True:
+        frontDistance, leftDistance, rightDistance = checkSensors(ser)
+        time.sleep(3)
+        obstacleavoiddrive()
     
 if __name__=="__main__":
     main()
